@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Соц-сеть Макс</title>
+<style>
+  /* Градиентный фон округлённый интерфейс */
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #85c1e9 0%, #16537e 100%);
+    color: black;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .centered {
+    max-width: 400px; margin: 40px auto; padding: 20px;
+    background: linear-gradient(135deg, #a2d1f7 0%, #2a5f8f 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    text-align: center;
+    color: black;
+  }
+  h1 {
+    font-size: 3em;
+    margin: 0 0 6px;
+    color: black;
+  }
+  h2 {
+    font-size: 1em;
+    margin: 0 0 20px;
+    color: purple;
+    font-weight: normal;
+  }
+  input[type="text"], input[type="tel"] {
+    width: 90%;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 1em;
+    outline: none;
+  }
+  button {
+    margin-top: 15px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    color: white;
+    background: linear-gradient(45deg, #3a8dde, #1c3b75);
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: linear-gradient(45deg, #1c3b75, #3a8dde);
+  }
+  /* Загрузка */
+  #loading {
+    font-size: 1.2em;
+    margin-top: 20px;
+    color: white;
+  }
+
+  /* Главное окно */
+  #mainApp {
+    display: flex;
+    height: 90vh;
+    max-width: 1000px;
+    margin: 20px auto;
+    background: linear-gradient(135deg, #a2d1f7 0%, #2a5f8f 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  nav {
+    width: 180px;
+    background: #18375b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    border-radius: 15px 0 0 15px;
+  }
+  nav button {
+    flex: none;
+    padding: 15px 10px;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 1em;
+    text-align: left;
+    cursor: pointer;
+    border-left: 5px solid transparent;
+    transition: background 0.3s, border-color 0.3s;
+    outline: none;
+  }
+  nav button:hover {
+    background: #2a598f;
+  }
+  nav button.active {
+    background: #123169;
+    border-left: 5px solid #68a5e8;
+  }
+  nav button.exit {
+    margin-top: auto;
+    color: #ea2c2c;
+    font-size: 0.8em;
+    border-left: none;
+    text-align: center;
+  }
+  nav button.exit:hover {
+    background: #ae2323;
+  }
+  main.content-area {
+    flex-grow: 1;
+    background: white;
+    color: black;
+    border-radius: 0 15px 15px 0;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  main.content-area h1 {
+    margin-top: 0;
+    font-size: 2em;
+  }
+  /* Новости */
+  #newsList {
+    margin-top: 15px;
+  }
+  .post {
+    border: 1px solid #cce0ff;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    background: #f0f7ff;
+  }
+  .post .name {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+  }
+  .post .text {
+    margin-bottom: 8px;
+  }
+  .post .stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+    align-items: center;
+  }
+  .post .stats .likes {
+    cursor: pointer;
+    user-select: none;
+    color: #2a5f8f;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .post .stats .likes:hover {
+    color: #104e8b;
+    text-decoration: underline;
+  }
+  /* Кнопка написать пост */
+  #writePostBtn {
+    background: #3a8dde;
+    border-radius: 12px;
+    border: none;
+    padding: 10px 18px;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 12px;
+  }
+  /* Форма для нового поста */
+  #newPostForm {
+    margin-bottom: 20px;
+  }
+  #newPostForm textarea {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 1em;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 8px;
+    font-family: Arial, sans-serif;
+  }
+  #newPostForm button {
+    background: #3a8dde;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+
+  /* Друзья */
+  #friendsList {
+    list-style: none;
+    padding: 0;
+    margin-top: 12px;
+  }
+  #friendsList li {
+    background: #d1e7ff;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: #184a7f;
+  }
+  #addFriendBtn {
+    background: #3a8dde;
+    border: none;
+    padding: 10px 18px;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 12px;
+  }
+
+  /* Мессенджер */
+  #chatList {
+    list-style: none;
+    padding: 0;
+    margin-top: 12px;
+    max-width: 300px;
+  }
+  #chatList li {
+    background: #d1e7ff;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #184a7f;
+  }
+  #chatList li.selected {
+    background: #3a8dde;
+    color: white;
+  }
+  #chatArea {
+    margin-top: 15px;
+    max-width: 600px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+  .message {
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 70%;
+  }
+  .from-them {
+    background: #a9c8ff;
+    align-self: flex-start;
+    color: #052f70;
+  }
+  .from-me {
+    background: #2a5f8f;
+    color: white;
+    align-self: flex-end;
+  }
+  #chatInputArea {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+  }
+  #chatInputArea input {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+  }
+  #chatInputArea button {
+    background: #3a8dde;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+
+  /* Нейро-Макс */
+  #neuroInput {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    margin-bottom: 12px;
+    font-family: Arial, sans-serif;
+  }
+  #askBtn {
+    background: #3a8dde;
+    border: none;
+    padding: 10px 18px;
+    color: white;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1.1em;
+  }
+  #neuroResponse {
+    margin-top: 16px;
+    font-size: 1.5em;
+    font-weight: bold;
+    min-height: 48px;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<!-- Стартовый экран -->
+<div id="startScreen" class="centered">
+  <h1>Соц-сеть Макс</h1>
+  <h2>поддержка Госуслуг</h2>
+  <input id="firstName" type="text" placeholder="Имя" autocomplete="off" />
+  <input id="lastName" type="text" placeholder="Фамилия" autocomplete="off" />
+  <input id="phone" type="tel" placeholder="номер телефона" autocomplete="off" />
+  <button id="loginBtn">Войти через мои налоги</button>
+  <div id="loading" style="display:none;"></div>
+</div>
+
+<!-- Основной интерфейс -->
+<div id="mainApp" style="display:none;">
+  <nav>
+    <button id="nav-news" class="active" type="button">новости</button>
+    <button id="nav-friends" type="button">друзья</button>
+    <button id="nav-messenger" type="button">Макс мессенджер</button>
+    <button id="nav-neuro" type="button">нейро-Макс</button>
+    <button id="nav-exit" class="exit" type="button">выйти</button>
+  </nav>
+  <main class="content-area" id="contentArea">
+    <!-- Контент будет подгружаться здесь -->
+  </main>
+</div>
+
+<script>
+  // Стартовые данные
+  const posts = [
+    {name: "Макс новости", text:"Россия лучшая и вот почему", likes: 999999, views: 0},
+    {name: "Егорка помидорка", text:"Я посрал, смотрите", likes: 2, views: 2567}
+  ];
+  const friends = ["Егорка помидорка", "Роскомнадзор"];
+  const chats = {
+    "Егорка помидорка": [
+      {from: "them", text: "пошли гулять"},
+      {from: "me", text: "щас иду"}
+    ],
+    "Дмитрий Нагиев": [
+      {from: "them", text: "Артулька, я на тебя подписан"}
+    ]
+  };
+
+  // Элементы управления
+  const startScreen = document.getElementById('startScreen');
+  const loginBtn = document.getElementById('loginBtn');
+  const loading = document.getElementById('loading');
+  const mainApp = document.getElementById('mainApp');
+  const contentArea = document.getElementById('contentArea');
+  const navButtons = {
+    news: document.getElementById('nav-news'),
+    friends: document.getElementById('nav-friends'),
+    messenger: document.getElementById('nav-messenger'),
+    neuro: document.getElementById('nav-neuro'),
+    exit: document.getElementById('nav-exit'),
+  };
+
+  // Меню переключает контент
+  function clearActive() {
+    Object.values(navButtons).forEach(b=>b.classList.remove('active'));
+  }
+  function showSection(section) {
+    clearActive();
+    navButtons[section].classList.add('active');
+    if(section === 'news') renderNews();
+    else if(section === 'friends') renderFriends();
+    else if(section === 'messenger') renderMessenger();
+    else if(section === 'neuro') renderNeuro();
+    else if(section === 'exit') goToStart();
+  }
+
+  // Рендер раздела Новости
+  function renderNews() {
+    contentArea.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Макс новостей';
+    contentArea.appendChild(h1);
+
+    const writePostBtn = document.createElement('button');
+    writePostBtn.id = 'writePostBtn';
+    writePostBtn.textContent = 'Написать пост';
+    contentArea.appendChild(writePostBtn);
+
+    // Список постов
+    const list = document.createElement('div');
+    list.id = 'newsList';
+    contentArea.appendChild(list);
+
+    function updateNewsList() {
+      list.innerHTML = '';
+      posts.forEach((p,i) => {
+        const post = document.createElement('div');
+        post.className = 'post';
+
+        const nameElem = document.createElement('div');
+        nameElem.className = 'name';
+        nameElem.textContent = p.name;
+        post.appendChild(nameElem);
+
+        const textElem = document.createElement('div');
+        textElem.className = 'text';
+        textElem.textContent = p.text;
+        post.appendChild(textElem);
+
+        const stats = document.createElement('div');
+        stats.className = 'stats';
+
+        const likes = document.createElement('div');
+        likes.className = 'likes';
+        likes.innerHTML = `&#128077; ${p.likes}`;
+        likes.title = "Нажмите, чтобы поставить лайк";
+        likes.style.userSelect = 'none';
+        likes.onclick = () => {
+          p.likes++;
+          updateNewsList();
+        };
+        stats.appendChild(likes);
+
+        const views = document.createElement('div');
+        views.textContent = `👁 ${p.views}`;
+        stats.appendChild(views);
+
+        post.appendChild(stats);
+        list.appendChild(post);
+      });
+    }
+    updateNewsList();
+
+    // Форма написания поста
+    let newPostForm = null;
+    writePostBtn.onclick = () => {
+      if(newPostForm) return; // уже открыт
+      newPostForm = document.createElement('div');
+      newPostForm.id = 'newPostForm';
+
+      const textarea = document.createElement('textarea');
+      textarea.placeholder = "Введите текст поста...";
+      newPostForm.appendChild(textarea);
+
+      const publishBtn = document.createElement('button');
+      publishBtn.textContent = 'опубликовать в Макс';
+      newPostForm.appendChild(publishBtn);
+
+      contentArea.insertBefore(newPostForm, list);
+
+      publishBtn.onclick = () => {
+        const text = textarea.value.trim();
+        if(text.length === 0) {
+          alert('Введите текст поста!');
+          return;
+        }
+        // Добавляем новый пост наверх
+        const rndViews = Math.floor(Math.random() * 301) + 100;
+        const rndLikes = Math.floor(Math.random() * 9) + 1;
+        posts.unshift({
+          name: "Артулька",
+          text,
+          views: rndViews,
+          likes: rndLikes
+        });
+        updateNewsList();
+        newPostForm.remove();
+        newPostForm = null;
+      };
+    };
+  }
+
+  // Рендер раздела Друзья
+  function renderFriends() {
+    contentArea.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Макс друзья';
+    contentArea.appendChild(h1);
+
+    const addFriendBtn = document.createElement('button');
+    addFriendBtn.id = 'addFriendBtn';
+    addFriendBtn.textContent = 'добавить друзей';
+    contentArea.appendChild(addFriendBtn);
+
+    const list = document.createElement('ul');
+    list.id = 'friendsList';
+    contentArea.appendChild(list);
+
+    function updateFriends() {
+      list.innerHTML = '';
+      friends.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = f;
+        list.appendChild(li);
+      });
+    }
+    updateFriends();
+
+    addFriendBtn.onclick = () => {
+      const friendName = prompt('Введите имя нового друга:');
+      if(friendName && friendName.trim()) {
+        friends.push(friendName.trim());
+        updateFriends();
+      }
+    };
+  }
+
+  // Мессенджер
+  function renderMessenger() {
+    contentArea.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Макс-чаты';
+    contentArea.appendChild(h1);
+
+    const info = document.createElement('div');
+    info.style.fontSize = '0.8em';
+    info.style.color = '#555';
+    info.style.marginBottom = '12px';
+    info.textContent = 'в целях качества обслуживания все разговоры записываются';
+    contentArea.appendChild(info);
+
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.gap = '20px';
+
+    const chatListEl = document.createElement('ul');
+    chatListEl.id = 'chatList';
+
+    let chatSelected = null;
+
+    function updateChatList() {
+      chatListEl.innerHTML = '';
+      Object.keys(chats).forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        if(name === chatSelected) li.classList.add('selected');
+        li.onclick = () => {
+          chatSelected = name;
+          updateChatList();
+          renderChatMessages(name);
+        };
+        chatListEl.appendChild(li);
+      });
+    }
+
+    const chatAreaEl = document.createElement('div');
+    chatAreaEl.id = 'chatArea';
+
+    function renderChatMessages(name) {
+      chatAreaEl.innerHTML = '';
+      const msgs = chats[name];
+      msgs.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'message ' + (m.from === 'me' ? 'from-me' : 'from-them');
+        div.textContent = m.text;
+        chatAreaEl.appendChild(div);
+      });
+
+      // input для нового сообщения
+      const inputArea = document.createElement('div');
+      inputArea.id = 'chatInputArea';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Введите сообщение...';
+      inputArea.appendChild(input);
+
+      const sendBtn = document.createElement('button');
+      sendBtn.textContent = 'Отправить';
+      sendBtn.onclick = () => {
+        const val = input.value.trim();
+        if(!val) return;
+        chats[name].push({from:'me', text: val});
+        input.value = '';
+        renderChatMessages(name);
+      };
+      inputArea.appendChild(sendBtn);
+
+      chatAreaEl.appendChild(inputArea);
+    }
+
+    container.appendChild(chatListEl);
+    container.appendChild(chatAreaEl);
+    contentArea.appendChild(container);
+
+    // Автооткрываем первый чат
+    chatSelected = Object.keys(chats)[0];
+    updateChatList();
+    renderChatMessages(chatSelected);
+  }
+
+  // Нейро-Макс
+  function renderNeuro() {
+    contentArea.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Нейросеть от Макс';
+    contentArea.appendChild(h1);
+
+    const subtitle = document.createElement('div');
+    subtitle.style.fontSize = '0.9em';
+    subtitle.style.color = '#555';
+    subtitle.style.marginBottom = '12px';
+    subtitle.textContent = 'МАКСимум возможностей с ИИ от Макс';
+    contentArea.appendChild(subtitle);
+
+    const input = document.createElement('input');
+    input.id = 'neuroInput';
+    input.type = 'text';
+    input.placeholder = "Введите текст...";
+    contentArea.appendChild(input);
+
+    const askBtn = document.createElement('button');
+    askBtn.id = 'askBtn';
+    askBtn.textContent = 'спросить';
+    contentArea.appendChild(askBtn);
+
+    const response = document.createElement('div');
+    response.id = 'neuroResponse';
+    contentArea.appendChild(response);
+
+    const answers = [
+      'Извините, я не могу ответить на данный вопрос',
+      'Извините по вашему запросу ничего не найдено',
+      'Ошибка повторите попытку позднее',
+      'Ошибка нет соединения с интернетом'
+    ];
+
+    askBtn.onclick = () => {
+      // Показать случайный ответ
+      const idx = Math.floor(Math.random() * answers.length);
+      response.textContent = answers[idx];
+    };
+  }
+
+  // Возврат на стартовый экран
+  function goToStart() {
+    mainApp.style.display = 'none';
+    startScreen.style.display = 'block';
+    clearActive();
+  }
+
+  // Логика входа с задержкой и загрузкой
+  loginBtn.addEventListener('click', () => {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    if(!firstName || !lastName || !phone) {
+      alert('Пожалуйста, заполните все поля');
+      return;
+    }
+    loginBtn.disabled = true;
+    loading.style.display = 'block';
+    loading.textContent = 'подключение к сервисам ВК...';
+    // Имитируем загрузку 10 сек
+    setTimeout(() => {
+      loading.style.display = 'none';
+      startScreen.style.display = 'none';
+      mainApp.style.display = 'flex';
+      showSection('news');
+      loginBtn.disabled = false;
+    }, 10000);
+  });
+
+  // Навигация
+  Object.entries(navButtons).forEach(([key, btn])=> {
+    btn.onclick = () => showSection(key);
+  });
+
+</script>
+</body>
+</html>
